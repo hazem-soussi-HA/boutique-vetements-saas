@@ -1,0 +1,84 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Commandes{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Activité</span>
+            <h1>Commandes</h1>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <form method="get" class="toolbar">
+                <input type="search" name="q" value="{{ search }}" placeholder="Référence, e-mail, nom..." style="min-width:230px;" aria-label="Rechercher une commande">
+                <select name="statut" aria-label="Filtrer par statut">
+                    <option value="">Tous les statuts</option>
+                    {% for key, label in statuses %}
+                        <option value="{{ key }}" {{ status == key ? 'selected' : '' }}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn--sm" type="submit">Filtrer</button>
+                <a class="btn btn--sm btn--ghost" href="{{ path('admin_order_index') }}">Réinitialiser</a>
+            </form>
+            <span class="text-muted" style="font-size:.82rem;">{{ total }} commande{{ total > 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="panel-body panel-body--flush">
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Référence</th>
+                            <th>Client</th>
+                            <th>Livraison</th>
+                            <th class="num">Articles</th>
+                            <th class="num">Total</th>
+                            <th>Paiement</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td><a href="{{ path('admin_order_show', {id: order.id}) }}"><strong>{{ order.reference }}</strong></a></td>
+                                <td>
+                                    {{ order.customerFullName }}<br>
+                                    <small class="text-muted">{{ order.customerEmail }}</small>
+                                </td>
+                                <td>{{ order.shippingCity }}{% if order.shippingWilaya %} ({{ order.shippingWilaya }}){% endif %}</td>
+                                <td class="num">{{ order.itemCount }}</td>
+                                <td class="num"><strong>{{ order.total|money }}</strong></td>
+                                <td class="text-muted" style="font-size:.78rem;">{{ order.paymentLabel }}</td>
+                                <td>
+                                    <span class="tag {{ order.status == 'livree' ? 'tag--ok' : order.status == 'annulee' ? 'tag--danger' : order.status == 'en_attente' ? 'tag--warn' : 'tag--info' }}">{{ order.statusLabel }}</span>
+                                </td>
+                                <td class="text-muted">{{ order.createdAt|date('d/m/Y') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="8" class="text-muted" style="text-align:center; padding:48px;">Aucune commande trouvée.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if pages > 1 %}
+            <div class="panel-body" style="border-top:1px solid var(--line);">
+                <nav class="pagination" aria-label="Pagination">
+                    {% set query = app.request.query.all %}
+                    {% if page > 1 %}<a href="{{ path('admin_order_index', query|merge({page: page - 1})) }}">←</a>{% endif %}
+                    {% set start = (page - 3)|max(1) %}
+                    {% set end = (start + 5)|min(pages) %}
+                    {% for i in start..end %}
+                        {% if i == page %}<span class="is-current">{{ i }}</span>{% else %}<a href="{{ path('admin_order_index', query|merge({page: i})) }}">{{ i }}</a>{% endif %}
+                    {% endfor %}
+                    {% if page < pages %}<a href="{{ path('admin_order_index', query|merge({page: page + 1})) }}">→</a>{% endif %}
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

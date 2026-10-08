@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact — {{ settings.shopName }}{% endblock %}
+
+{% block body %}
+    <section class="section section--tight">
+        <div class="container">
+            <div style="max-width:60ch;">
+                <span class="eyebrow">Contact</span>
+                <h1 style="font-size: clamp(2rem,4vw,3rem);">Parlons de votre projet</h1>
+                <p class="lead">Une question sur une taille, une commande sur mesure, un partenariat ? Écrivez-nous, on répond sous 24h ouvrées.</p>
+            </div>
+
+            <div class="grid-2" style="margin-top:44px; align-items:start;">
+                <div class="form-card">
+                    <h3 style="font-family:var(--font-body); font-size:.82rem; letter-spacing:.16em; text-transform:uppercase; margin-bottom:22px;">Envoyer un message</h3>
+                    {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+                        {{ form_row(form.fullName) }}
+                        <div class="form-row">
+                            {{ form_row(form.email) }}
+                            {{ form_row(form.phone) }}
+                        </div>
+                        {{ form_row(form.subject) }}
+                        {{ form_row(form.message) }}
+                        <button class="btn btn--block" type="submit">Envoyer le message</button>
+                    {{ form_end(form) }}
+                </div>
+
+                <div>
+                    <div class="panel">
+                        <div class="panel-head"><h2>Coordonnées</h2></div>
+                        <div class="panel-body">
+                            <div style="display:grid; gap:18px;">
+                                <div>
+                                    <span class="field-label">E-mail</span>
+                                    <a href="mailto:{{ settings.contactEmail }}">{{ settings.contactEmail }}</a>
+                                </div>
+                                <div>
+                                    <span class="field-label">Téléphone / WhatsApp</span>
+                                    <a href="tel:{{ settings.contactPhone }}">{{ settings.contactPhone }}</a>
+                                </div>
+                                <div>
+                                    <span class="field-label">Atelier</span>
+                                    <p style="margin:0;">{{ settings.contactAddress }}</p>
+                                </div>
+                                <div>
+                                    <span class="field-label">Horaires</span>
+                                    <p style="margin:0;">Samedi – Jeudi : 9h00 – 18h00<br>Vendredi : 14h00 – 18h00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-head"><h2>Réseaux</h2></div>
+                        <div class="panel-body">
+                            <div style="display:grid; gap:12px; font-size:.92rem;">
+                                {% if settings.facebookUrl %}<a href="{{ settings.facebookUrl }}" target="_blank" rel="noopener">Facebook →</a>{% endif %}
+                                {% if settings.instagramUrl %}<a href="{{ settings.instagramUrl }}" target="_blank" rel="noopener">Instagram →</a>{% endif %}
+                                {% if settings.tiktokUrl %}<a href="{{ settings.tiktokUrl }}" target="_blank" rel="noopener">TikTok →</a>{% endif %}
+                                {% if settings.whatsappUrl %}<a href="{{ settings.whatsappUrl }}" target="_blank" rel="noopener">WhatsApp →</a>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="faq" style="background: var(--white); border-top:1px solid var(--line);">
+        <div class="container" style="max-width:860px;">
+            <div class="section-head" style="justify-content:center; text-align:center;">
+                <div><span class="eyebrow">FAQ</span><h2>Questions fréquentes</h2></div>
+            </div>
+
+            <div style="display:grid; gap:12px;">
+                <details class="panel" style="margin:0;">
+                    <summary style="padding:20px 24px; cursor:pointer; font-weight:600;">Quels sont les délais de livraison ?</summary>
+                    <div class="panel-body" style="padding-top:0;">
+                        <p class="text-muted" style="margin:0;">Expédition sous 48h ouvrées. Comptez 2 à 5 jours ouvrés pour Alger et Blida, 3 à 7 jours pour les autres wilayas.</p>
+                    </div>
+                </details>
+                <details class="panel" style="margin:0;">
+                    <summary style="padding:20px 24px; cursor:pointer; font-weight:600;">Comment choisir ma taille ?</summary>
+                    <div class="panel-body" style="padding-top:0;">
+                        <p class="text-muted" style="margin:0;">Chaque fiche produit liste les tailles disponibles et notre guide est basé sur vos mesures habituelles. En cas d’hésitation, envoyez-nous votre taille habituelle et votre hauteur : on vous conseille une pièce précise.</p>
+                    </div>
+                </details>
+                <details class="panel" style="margin:0;">
+                    <summary style="padding:20px 24px; cursor:pointer; font-weight:600;">Puis-je retourner un article ?</summary>
+                    <div class="panel-body" style="padding-top:0;">
+                        <p class="text-muted" style="margin:0;">Oui, sous 14 jours, dans l’emballage d’origine et non porté. L’échange de taille est gratuit, le remboursement se fait sous 7 jours ouvrés.</p>
+                    </div>
+                </details>
+                <details class="panel" style="margin:0;">
+                    <summary style="padding:20px 24px; cursor:pointer; font-weight:600;">Proposez-vous des commandes sur mesure ?</summary>
+                    <div class="panel-body" style="padding-top:0;">
+                        <p class="text-muted" style="margin:0;">Oui, pour les tenues de cérémonie et les costumes. Passez par le formulaire en précisant vos mesures et la date souhaitée, on vous envoie un devis sous 48h.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+{% endblock %}

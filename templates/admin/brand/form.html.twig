@@ -1,0 +1,33 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Catalogue</span>
+            <h1>{{ title }}</h1>
+        </div>
+        <a class="btn btn--sm btn--ghost" href="{{ path('admin_brand_index') }}">← Retour aux marques</a>
+    </div>
+
+    <div class="admin-form-wrap">
+        <div class="form-card">
+            {{ form_start(form) }}
+                <div class="form-row">
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.country) }}
+                </div>
+                {{ form_row(form.slug) }}
+                {{ form_row(form.logo) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.isFeatured) }}
+
+                <div class="form-actions">
+                    <button class="btn" type="submit">{{ brand.id ? 'Enregistrer' : 'Créer la marque' }}</button>
+                    <a class="btn btn--ghost" href="{{ path('admin_brand_index') }}">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

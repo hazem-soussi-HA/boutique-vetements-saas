@@ -1,0 +1,60 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Paramètres{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Configuration</span>
+            <h1>Paramètres de la boutique</h1>
+            <p class="text-muted" style="margin:6px 0 0;">Ces informations alimentent le site public : hero, contact, livraison.</p>
+        </div>
+    </div>
+
+    <div class="admin-form-wrap">
+        <div class="form-card">
+            {{ form_start(form) }}
+
+            <h3 style="font-family:var(--font-body); font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; margin:0 0 20px;">Identité</h3>
+            {{ form_row(form.shopName) }}
+            {{ form_row(form.tagline) }}
+
+            <h3 style="font-family:var(--font-body); font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; margin:32px 0 20px;">Page d’accueil (hero)</h3>
+            {{ form_row(form.heroTitle) }}
+            {{ form_row(form.heroSubtitle) }}
+            {{ form_row(form.heroImage) }}
+            {{ form_row(form.announcement) }}
+
+            <h3 style="font-family:var(--font-body); font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; margin:32px 0 20px;">Contact</h3>
+            <div class="form-row">
+                {{ form_row(form.contactEmail) }}
+                {{ form_row(form.contactPhone) }}
+            </div>
+            {{ form_row(form.contactAddress) }}
+
+            <h3 style="font-family:var(--font-body); font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; margin:32px 0 20px;">Réseaux sociaux</h3>
+            <div class="form-row">
+                {{ form_row(form.facebookUrl) }}
+                {{ form_row(form.instagramUrl) }}
+            </div>
+            <div class="form-row">
+                {{ form_row(form.tiktokUrl) }}
+                {{ form_row(form.whatsappUrl) }}
+            </div>
+
+            <h3 style="font-family:var(--font-body); font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; margin:32px 0 20px;">Livraison &amp; fiscalité</h3>
+            <div class="form-row">
+                {{ form_row(form.freeShippingThreshold) }}
+                {{ form_row(form.shippingFee) }}
+            </div>
+            {{ form_row(form.vatRate) }}
+
+            <div class="form-actions">
+                <button class="btn" type="submit">Enregistrer les paramètres</button>
+                <a class="btn btn--ghost" href="{{ path('app_home') }}" target="_blank" rel="noopener">Aperçu du site ↗</a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

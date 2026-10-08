@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+{% import 'partials/product.html.twig' as p %}
+
+{% block title %}
+    {% if currentCategory %}{{ currentCategory.name }} — {% endif %}Boutique — {{ settings.shopName }}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <nav class="crumbs" aria-label="Fil d'Ariane">
+            <a href="{{ path('app_home') }}">Accueil</a> <span>/</span>
+            <a href="{{ path('app_shop') }}">Boutique</a>
+            {% if currentCategory %}<span>/</span> <span class="text-muted">{{ currentCategory.name }}</span>{% endif %}
+        </nav>
+
+        {% if currentCategory %}
+            <div style="margin-bottom:34px; max-width:60ch;">
+                <span class="eyebrow">Collection</span>
+                <h1 style="font-size: clamp(2rem,4vw,3rem);">{{ currentCategory.name }}</h1>
+                {% if currentCategory.description %}<p class="lead">{{ currentCategory.description }}</p>{% endif %}
+            </div>
+        {% else %}
+            <div style="margin-bottom:34px; max-width:60ch;">
+                <span class="eyebrow">Boutique</span>
+                <h1 style="font-size: clamp(2rem,4vw,3rem);">Toutes les pièces</h1>
+                <p class="lead">Filtrez par collection, taille, couleur ou budget pour trouver votre pièce.</p>
+            </div>
+        {% endif %}
+
+        <div class="shop-layout">
+            <aside class="filters">
+                <form method="get" action="{{ path('app_shop') }}">
+                    {% if criteria.category is defined and criteria.category %}<input type="hidden" name="cat" value="{{ criteria.category }}">{% endif %}
+                    {% if criteria.brand is defined and criteria.brand %}<input type="hidden" name="marque" value="{{ criteria.brand }}">{% endif %}
+
+                    <div class="filter-group">
+                        <h4>Recherche</h4>
+                        <input type="search" name="q" value="{{ criteria.search|default('') }}" placeholder="Nom, référence..." aria-label="Rechercher">
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Collections</h4>
+                        <ul class="filter-list">
+                            <li>
+                                <a href="{{ path('app_shop') }}" class="{{ criteria.category|default(null) is null ? 'is-active' : '' }}">
+                                    Toutes <span>{{ total }}</span>
+                                </a>
+                            </li>
+                            {% for category in categories %}
+                                <li>
+                                    <a href="{{ path('app_shop_category', {slug: category.slug}) }}"
+                                       class="{{ criteria.category|default(null) == category.slug ? 'is-active' : '' }}">{{ category.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    {% if brands is not empty %}
+                        <div class="filter-group">
+                            <h4>Marques</h4>
+                            <ul class="filter-list">
+                                {% for brand in brands %}
+                                    <li>
+                                        <a href="{{ path('app_shop') }}?marque={{ brand.slug }}"
+                                           class="{{ criteria.brand|default(null) == brand.slug ? 'is-active' : '' }}">{{ brand.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="filter-group">
+                        <h4>Genre</h4>
+                        <div class="chip-row">
+                            {% for label, value in {'Femme': 'femme', 'Homme': 'homme', 'Unisexe': 'unisexe'} %}
+                                <a class="chip {{ criteria.gender|default(null) == value ? 'is-active' : '' }}"
+                                   href="{{ path('app_shop', app.request.query.all|merge({genre: criteria.gender|default(null) == value ? null : value})) }}">{{ label }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if sizes is not empty %}
+                        <div class="filter-group">
+                            <h4>Tailles</h4>
+                            <div class="chip-row">
+                                {% for size in sizes %}
+                                    <a class="chip {{ criteria.size|default(null) == size ? 'is-active' : '' }}"
+                                       href="{{ path('app_shop', app.request.query.all|merge({taille: criteria.size|default(null) == size ? null : size})) }}">{{ size }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if colors is not empty %}
+                        <div class="filter-group">
+                            <h4>Couleurs</h4>
+                            <div class="chip-row">
+                                {% for color in colors %}
+                                    <a class="chip {{ criteria.color|default(null) == color ? 'is-active' : '' }}"
+                                       href="{{ path('app_shop', app.request.query.all|merge({couleur: criteria.color|default(null) == color ? null : color})) }}">{{ color }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="filter-group">
+                        <h4>Budget (DA)</h4>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="number" name="min" value="{{ criteria.minPrice|default(null) ? (criteria.minPrice / 100)|round : '' }}" placeholder="Min" min="0" step="500" aria-label="Prix minimum">
+                            <span class="text-muted">—</span>
+                            <input type="number" name="max" value="{{ criteria.maxPrice|default(null) ? (criteria.maxPrice / 100)|round : '' }}" placeholder="Max" min="0" step="500" aria-label="Prix maximum">
+                        </div>
+                        <p class="field-help">De {{ priceRange[0]|price_range(priceRange[0], priceRange[1]) }}</p>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Options</h4>
+                        <label class="checkbox" style="margin-bottom:10px;">
+                            <input type="checkbox" name="promo" value="1" {{ criteria.onSale|default(false) ? 'checked' : '' }}>
+                            <span>En promotion</span>
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" name="stock" value="1" {{ criteria.inStock|default(false) ? 'checked' : '' }}>
+                            <span>Disponible immédiatement</span>
+                        </label>
+                    </div>
+
+                    <div style="display:flex; gap:8px; padding-top:18px;">
+                        <button class="btn btn--sm" type="submit">Filtrer</button>
+                        <a class="btn btn--ghost btn--sm" href="{{ path('app_shop') }}">Réinitialiser</a>
+                    </div>
+                </form>
+            </aside>
+
+            <div>
+                <div class="shop-toolbar">
+                    <span class="result-count">{{ total }} article{{ total > 1 ? 's' : '' }}{% if criteria.search %} pour « {{ criteria.search }} »{% endif %}</span>
+                    <div class="toolbar">
+                        <form method="get" action="{{ path('app_shop') }}" style="display:flex; gap:8px; align-items:center;">
+                            {% for key, value in app.request.query.all %}
+                                {% if key != 'tri' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
+                            {% endfor %}
+                            <label class="field-label" for="tri" style="margin:0;">Trier</label>
+                            <select id="tri" name="tri" onchange="this.form.submit()">
+                                <option value="recent" {{ sort == 'recent' ? 'selected' : '' }}>Plus récents</option>
+                                <option value="prix-asc" {{ sort == 'prix-asc' ? 'selected' : '' }}>Prix croissant</option>
+                                <option value="prix-desc" {{ sort == 'prix-desc' ? 'selected' : '' }}>Prix décroissant</option>
+                                <option value="nom" {{ sort == 'nom' ? 'selected' : '' }}>Nom (A→Z)</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+
+                {% if products is empty %}
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24"><path d="M4 7h16l-1 14H5L4 7z"/><path d="M9 11v6M15 11v6"/></svg>
+                        <h3>Aucun article ne correspond</h3>
+                        <p class="text-muted">Essayez d’élargir vos filtres ou de modifier votre recherche.</p>
+                        <a class="btn btn--ghost" href="{{ path('app_shop') }}">Voir tout le catalogue</a>
+                    </div>
+                {% else %}
+                    {{ p.grid(products) }}
+
+                    {% if pages > 1 %}
+                        <nav class="pagination" aria-label="Pagination">
+                            {% set query = app.request.query.all %}
+                            {% if page > 1 %}<a href="{{ path('app_shop', query|merge({page: page - 1})) }}">←</a>{% endif %}
+
+                            {% set start = (page - 3)|max(1) %}
+                            {% set end = (start + 5)|min(pages) %}
+                            {% for i in start..end %}
+                                {% if i == page %}
+                                    <span class="is-current">{{ i }}</span>
+                                {% else %}
+                                    <a href="{{ path('app_shop', query|merge({page: i})) }}">{{ i }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page < pages %}<a href="{{ path('app_shop', query|merge({page: page + 1})) }}">→</a>{% endif %}
+                        </nav>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

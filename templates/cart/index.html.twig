@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon panier — {{ settings.shopName }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <nav class="crumbs" aria-label="Fil d'Ariane">
+            <a href="{{ path('app_home') }}">Accueil</a> <span>/</span> <span class="text-muted">Panier</span>
+        </nav>
+
+        <h1 style="font-size: clamp(2rem,4vw,3rem);">Mon panier</h1>
+
+        {% if lines is empty %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+                <h3>Votre panier est vide</h3>
+                <p class="text-muted">Parcourez la collection et ajoutez vos coups de cœur.</p>
+                <a class="btn" href="{{ path('app_shop') }}">Découvrir la boutique</a>
+            </div>
+        {% else %}
+            <div class="cart-layout">
+                <div>
+                    {% for line in lines %}
+                        <div class="cart-line">
+                            <a class="cart-line-media" href="{{ path('app_product', {slug: line.product.slug}) }}">
+                                {% if line.product.mainImage %}
+                                    <img src="{{ line.product.mainImage }}" alt="{{ line.product.name }}" loading="lazy">
+                                {% else %}
+                                    <svg viewBox="0 0 300 400"><rect width="300" height="400" fill="#f3ece4"/></svg>
+                                {% endif %}
+                            </a>
+
+                            <div>
+                                <h4><a href="{{ path('app_product', {slug: line.product.slug}) }}">{{ line.product.name }}</a></h4>
+                                <p class="line-meta">
+                                    {% if line.size %}Taille {{ line.size }}{% endif %}
+                                    {% if line.size and line.color %} · {% endif %}
+                                    {% if line.color %}Couleur {{ line.color }}{% endif %}
+                                    · {{ line.unitPrice|money }} l’unité
+                                </p>
+                                <p class="line-meta">Stock disponible : {{ line.product.stock }}</p>
+                            </div>
+
+                            <div class="cart-line-actions">
+                                <form method="post" action="{{ path('app_cart_update') }}" style="display:flex; gap:8px; align-items:center;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                                    <input type="hidden" name="line" value="{{ line.key }}">
+                                    <input type="number" name="quantity" value="{{ line.quantity }}" min="1" max="{{ line.product.stock }}" style="width:82px; padding:8px 10px;" aria-label="Quantité pour {{ line.product.name }}">
+                                    <button class="btn btn--sm" type="submit">OK</button>
+                                </form>
+
+                                <form method="post" action="{{ path('app_cart_remove') }}" class="inline-form" data-confirm="Retirer cet article du panier ?">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('cart') }}">
+                                    <input type="hidden" name="line" value="{{ line.key }}">
+                                    <button class="btn btn--sm btn--ghost" type="submit">Retirer</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <p style="margin-top:26px;">
+                        <a class="link-arrow" href="{{ path('app_shop') }}">← Continuer mes achats</a>
+                    </p>
+                </div>
+
+                <aside class="summary">
+                    <h3>Récapitulatif</h3>
+                    <div class="summary-row"><span>Sous-total ({{ lines|length }} ligne{{ lines|length > 1 ? 's' : '' }})</span> <span>{{ subtotal|money }}</span></div>
+                    <div class="summary-row"><span>Livraison</span> <span>{{ shipping == 0 ? 'Offerte' : shipping|money }}</span></div>
+
+                    {% if shipping > 0 and settings.freeShippingThreshold > 0 %}
+                        <p class="free-ship-note">
+                            Ajoutez {{ (settings.freeShippingThreshold - subtotal)|money }} pour la livraison offerte.
+                        </p>
+                    {% endif %}
+
+                    <div class="summary-row total"><span>Total</span> <span>{{ total|money }}</span></div>
+                    <p class="text-muted" style="font-size:.8rem;">TVA ({{ settings.vatRate }}%) : {{ settings.vatAmount(total)|money }} — incluse dans le total.</p>
+
+                    <a class="btn btn--block" href="{{ path('app_checkout') }}">Passer commande</a>
+                    <p style="text-align:center; font-size:.78rem; color:var(--ink-mute); margin-top:14px; margin-bottom:0;">
+                        Paiement à la livraison ou virement bancaire.
+                    </p>
+                </aside>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

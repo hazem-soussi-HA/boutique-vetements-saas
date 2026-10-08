@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }} — {{ settings.shopName }}{% endblock %}
+{% block meta_description %}{{ product.shortDescription ? product.shortDescription|striptags|text_limit(155) : product.name }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <nav class="crumbs" aria-label="Fil d'Ariane">
+            <a href="{{ path('app_home') }}">Accueil</a> <span>/</span>
+            <a href="{{ path('app_shop') }}">Boutique</a>
+            {% if product.category %}
+                <span>/</span> <a href="{{ path('app_shop_category', {slug: product.category.slug}) }}">{{ product.category.name }}</a>
+            {% endif %}
+            <span>/</span> <span class="text-muted">{{ product.name }}</span>
+        </nav>
+
+        <div class="pdp">
+            <div class="pdp-gallery" data-gallery>
+                {% set mainSrc = product.mainImage %}
+                {% if gallery|length > 0 %}{% set mainSrc = gallery|first %}{% endif %}
+                <div class="pdp-main">
+                    {% if mainSrc %}
+                        <img data-gallery-main src="{{ mainSrc }}" alt="{{ product.name }}" style="transition:opacity .3s">
+                    {% else %}
+                        <svg viewBox="0 0 300 400" aria-label="{{ product.name }}"><rect width="300" height="400" fill="#f3ece4"/><path d="M120 90l30 20 30-20 60 30-20 40-16-8v180H96V152l-16 8-20-40z" fill="#d9cabb"/></svg>
+                    {% endif %}
+                </div>
+
+                {% if gallery|length > 1 %}
+                    <div class="pdp-thumbs">
+                        {% for image in gallery %}
+                            <div class="pdp-thumb {{ loop.first ? 'is-active' : '' }}">
+                                <img data-gallery-thumb src="{{ image }}" data-alt="{{ product.name }}" alt="{{ product.name }} vue {{ loop.index }}" loading="lazy">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="pdp-info">
+                <span class="eyebrow">
+                    {{ product.category ? product.category.name : 'Collection' }}{% if product.brand %} · {{ product.brand.name }}{% endif %}
+                </span>
+                <h1>{{ product.name }}</h1>
+                <p class="text-muted" style="font-size:.86rem;">Réf. {{ product.sku }}</p>
+
+                <div class="pdp-price">
+                    <span class="price-now">{{ product.effectivePrice|money }}</span>
+                    {% if product.discountPercent > 0 %}
+                        <span class="price-was">{{ product.price|money }}</span>
+                        <span class="price-badge">-{{ product.discountPercent }}%</span>
+                    {% endif %}
+                </div>
+
+                {% if product.shortDescription %}
+                    <p class="lead">{{ product.shortDescription }}</p>
+                {% endif %}
+
+                {% if product.inStock %}
+                    <p style="color: var(--success); font-size:.9rem; font-weight:600;">
+                        ● En stock{% if product.isLowStock %} — plus que {{ product.stock }} pièces{% endif %}
+                    </p>
+                {% else %}
+                    <p style="color: var(--danger); font-size:.9rem; font-weight:600;">● Rupture de stock</p>
+                {% endif %}
+
+                {% if product.sizes|length > 0 %}
+                    <div class="opt-block" data-options>
+                        <span class="field-label">Taille</span>
+                        <div class="opt-list">
+                            {% for size in product.sizes %}
+                                <button class="opt {{ loop.first ? 'is-selected' : '' }}" type="button" data-value="{{ size }}">{{ size }}</button>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="size" value="{{ product.sizes|first }}">
+                        <p class="field-help">Entre deux tailles ? Choisissez la plus grande.</p>
+                    </div>
+                {% endif %}
+
+                {% if product.colors|length > 0 %}
+                    <div class="opt-block" data-options>
+                        <span class="field-label">Couleur</span>
+                        <div class="opt-list">
+                            {% for color in product.colors %}
+                                <button class="opt {{ loop.first ? 'is-selected' : '' }}" type="button" data-value="{{ color }}">{{ color }}</button>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="color" value="{{ product.colors|first }}">
+                    </div>
+                {% endif %}
+
+                {% if product.inStock %}
+                    <form method="post" action="{{ path('app_cart_add', {id: product.id}) }}" style="margin-top:26px;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cart_add') }}">
+                        {% if product.sizes|length > 0 %}<input type="hidden" name="size" value="{{ product.sizes|first }}" data-sync="size">{% endif %}
+                        {% if product.colors|length > 0 %}<input type="hidden" name="color" value="{{ product.colors|first }}" data-sync="color">{% endif %}
+
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                            <div class="qty-picker" data-qty>
+                                <button type="button" data-step="down" aria-label="Diminuer">−</button>
+                                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" aria-label="Quantité">
+                                <button type="button" data-step="up" aria-label="Augmenter">+</button>
+                            </div>
+                            <button class="btn" type="submit" style="flex:1; min-width:200px;">Ajouter au panier</button>
+                        </div>
+                        <button class="btn btn--ghost w-full" type="submit" name="buy_now" value="1" style="margin-top:10px;">Commander maintenant</button>
+                    </form>
+                {% endif %}
+
+                <div class="pdp-meta">
+                    {% if product.materials|length > 0 %}
+                        <div><dt>Matières</dt><dd>{{ product.materials|join(', ') }}</dd></div>
+                    {% endif %}
+                    <div><dt>Genre</dt><dd>{{ product.gender|capitalize }}</dd></div>
+                    {% if product.brand %}<div><dt>Maison</dt><dd>{{ product.brand.name }}</dd></div>{% endif %}
+                    <div><dt>Livraison</dt><dd>48h — 58 wilayas</dd></div>
+                    <div><dt>Paiement</dt><dd>À la livraison</dd></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab-nav" role="tablist">
+                <button type="button" class="is-active" data-tab="desc">Description</button>
+                <button type="button" data-tab="entretien">Entretien</button>
+                <button type="button" data-tab="livraison">Livraison & retours</button>
+            </div>
+
+            <div data-panel="desc">
+                {% if product.description %}
+                    {% for paragraph in product.description|split('\n\n') %}
+                        <p class="lead" style="max-width:70ch;">{{ paragraph }}</p>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Description détaillée à venir.</p>
+                {% endif %}
+            </div>
+
+            <div data-panel="entretien" hidden>
+                <p class="lead" style="max-width:70ch;">Lavage à froid ou nettoyage à sec. Repassage à basse température, à l’envers. Suspendre sur cintre large pour préserver la forme. La teinture peut légèrement s’estomper au premier lavage.</p>
+            </div>
+
+            <div data-panel="livraison" hidden>
+                <p class="lead" style="max-width:70ch;">
+                    Expédition sous 48h ouvrées. Livraison à domicile ({{ settings.shippingFee|money }}) ou en bureau de retrait.
+                    {% if settings.freeShippingThreshold > 0 %}Livraison offerte dès {{ settings.freeShippingThreshold|money }} d’achat.{% endif %}
+                    Retour gratuit sous 14 jours dans l’emballage d’origine.
+                </p>
+            </div>
+        </div>
+
+        {% if related is not empty %}
+            <section class="section" style="padding-top:0;">
+                <div class="section-head">
+                    <div>
+                        <span class="eyebrow">Vous aimerez aussi</span>
+                        <h2>Dans le même esprit</h2>
+                    </div>
+                </div>
+                {% import 'partials/product.html.twig' as p %}
+                {{ p.grid(related) }}
+            </section>
+        {% endif %}
+    </div>
+
+    <script>
+    (function () {
+        var nav = document.querySelectorAll('[data-tab]');
+        nav.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                nav.forEach(function (b) { b.classList.remove('is-active'); });
+                btn.classList.add('is-active');
+                document.querySelectorAll('[data-panel]').forEach(function (p) { p.hidden = true; });
+                var panel = document.querySelector('[data-panel="' + btn.dataset.tab + '"]');
+                if (panel) panel.hidden = false;
+            });
+        });
+    })();
+    </script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Marques{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Catalogue</span>
+            <h1>Marques partenaires</h1>
+        </div>
+        <a class="btn btn--sm" href="{{ path('admin_brand_new') }}">+ Nouvelle marque</a>
+    </div>
+
+    <div class="panel">
+        <div class="panel-body panel-body--flush">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Marque</th><th>Pays</th><th>Slug</th><th>Statut</th><th style="text-align:right;">Actions</th></tr>
+                </thead>
+                <tbody>
+                    {% for brand in brands %}
+                        <tr>
+                            <td>
+                                <div class="cell-product">
+                                    {% if brand.logo %}<div class="table-media"><img src="{{ brand.logo }}" alt="" loading="lazy"></div>{% endif %}
+                                    <div>
+                                        <strong>{{ brand.name }}</strong>
+                                        {% if brand.description %}<small>{{ brand.description|text_limit(64) }}</small>{% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ brand.country ?? '—' }}</td>
+                            <td class="text-muted">{{ brand.slug }}</td>
+                            <td>
+                                {% if brand.isFeatured %}<span class="tag tag--ok">Partenaire</span>{% else %}<span class="tag tag--muted">Masquée</span>{% endif %}
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                    <a class="icon-action" href="{{ path('app_brand', {slug: brand.slug}) }}" target="_blank" rel="noopener" title="Voir sur le site">
+                                        <svg viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+                                    </a>
+                                    <a class="icon-action" href="{{ path('admin_brand_edit', {id: brand.id}) }}" title="Modifier">
+                                        <svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>
+                                    </a>
+                                    <form method="post" action="{{ path('admin_brand_delete', {id: brand.id}) }}" class="inline-form"
+                                          data-confirm="Supprimer la marque « {{ brand.name }} » ?">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ brand.id) }}">
+                                        <button class="icon-action icon-action--danger" type="submit" title="Supprimer">
+                                            <svg viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5" class="text-muted" style="text-align:center; padding:48px;">
+                            Aucune marque. <a href="{{ path('admin_brand_new') }}">Créer la première →</a>
+                        </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

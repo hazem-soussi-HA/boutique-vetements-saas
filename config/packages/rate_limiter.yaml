@@ -1,0 +1,23 @@
+framework:
+    rate_limiter:
+        # Public write endpoints: protects against spam/abuse floods.
+        contact_form:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '1 hour'
+        newsletter:
+            policy: 'fixed_window'
+            limit: 10
+            interval: '1 hour'
+        # Cart mutations, keyed per IP.
+        cart:
+            policy: 'fixed_window'
+            limit: 60
+            interval: '1 minute'
+
+when@test:
+    framework:
+        rate_limiter:
+            contact_form: null
+            newsletter: null
+            cart: null

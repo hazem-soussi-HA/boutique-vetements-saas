@@ -1,0 +1,36 @@
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.local.dist
+/.phpunit.cache/
+/.phpunit.result.cache
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+# local overrides / operator secrets
+.env.local.dist
+/phpunit.xml
+
+###> phpunit/phpunit ###
+/phpunit.xml
+###< phpunit/phpunit ###
+
+###> nyc ###
+/.nyc_output/
+/coverage/
+###< nyc ###
+
+# debug leftovers from local curl / session debugging
+*_cookies*.txt
+session_*.txt
+*_debug*.txt
+
+# editors & OS
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db

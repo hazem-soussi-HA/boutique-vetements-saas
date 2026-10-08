@@ -1,0 +1,222 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Pilotage</span>
+            <h1>Bonjour, {{ app.user.fullName|default('gérant') }} 👋</h1>
+        </div>
+        <div class="toolbar">
+            <a class="btn btn--ghost btn--sm" href="{{ path('app_home') }}" target="_blank" rel="noopener">Voir le site ↗</a>
+            <a class="btn btn--sm" href="{{ path('admin_product_new') }}">+ Nouveau produit</a>
+        </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Chiffre d’affaires</span>
+                <span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V7"/></svg></span>
+            </div>
+            <span class="stat-value">{{ stats.revenue|money }}</span>
+            <span class="stat-foot">Ce mois : {{ stats.monthRevenue|money }}</span>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Commandes</span>
+                <span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 4h14l-1 16H6L5 4z"/><path d="M9 9h6"/></svg></span>
+            </div>
+            <span class="stat-value">{{ stats.orders }}</span>
+            <span class="stat-foot">{{ stats.newOrders }} sur les 30 derniers jours</span>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Produits en ligne</span>
+                <span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 8h10l-1 12H8L7 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span>
+            </div>
+            <span class="stat-value">{{ stats.products }}</span>
+            <span class="stat-foot">{{ stock.low }} en stock bas · {{ stock.out }} en rupture</span>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Messages non lus</span>
+                <span class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6"/></svg></span>
+            </div>
+            <span class="stat-value">{{ stats.unreadMessages }}</span>
+            <span class="stat-foot"><a href="{{ path('admin_message_index') }}">Boîte de réception →</a></span>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Abonnés newsletter</span>
+                <span class="stat-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M4 7l8 7 8-7"/></svg></span>
+            </div>
+            <span class="stat-value">{{ stats.subscribers }}</span>
+            <span class="stat-foot"><a href="{{ path('admin_subscriber_index') }}">Gérer la liste →</a></span>
+        </div>
+
+        <div class="stat">
+            <div class="stat-top">
+                <span class="stat-label">Catégories</span>
+                <span class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="7"/><rect x="13" y="4" width="8" height="7"/><rect x="3" y="14" width="8" height="7"/><rect x="13" y="14" width="8" height="7"/></svg></span>
+            </div>
+            <span class="stat-value">{{ stats.categories }}</span>
+            <span class="stat-foot"><a href="{{ path('admin_category_index') }}">Organiser →</a></span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h2>Ventes des 14 derniers jours</h2>
+            <span class="text-muted" style="font-size:.8rem;">Total période : {{ salesSeries|reduce((carry, v) => carry + v, 0)|money }}</span>
+        </div>
+        <div class="panel-body">
+            {% set peak = salesSeries|reduce((carry, v) => carry > v ? carry : v, 0) %}
+            {% if peak > 0 %}
+                <div class="chart">
+                    {% for day, amount in salesSeries %}
+                        <div class="chart-col" title="{{ day }} — {{ amount|money }}">
+                            <div class="chart-bar" style="height: {{ ((amount / peak) * 100)|round(1) }}%"></div>
+                            <span class="chart-label">{{ day|date('d/m') }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Aucune vente sur la période.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="panel">
+            <div class="panel-head">
+                <h2>Dernières commandes</h2>
+                <a class="link-arrow" href="{{ path('admin_order_index') }}">Tout voir →</a>
+            </div>
+            <div class="panel-body panel-body--flush">
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Référence</th><th>Client</th><th>Total</th><th>Statut</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recentOrders %}
+                            <tr>
+                                <td><a href="{{ path('admin_order_show', {id: order.id}) }}"><strong>{{ order.reference }}</strong></a><br><small class="text-muted">{{ order.createdAt|date('d/m/Y') }}</small></td>
+                                <td>{{ order.customerFullName }}</td>
+                                <td class="num">{{ order.total|money }}</td>
+                                <td>
+                                    <span class="tag {{ order.status == 'livree' ? 'tag--ok' : order.status == 'annulee' ? 'tag--danger' : order.status == 'en_attente' ? 'tag--warn' : 'tag--info' }}">{{ order.statusLabel }}</span>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="4" class="text-muted">Aucune commande pour le moment.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2>Répartition des commandes</h2>
+            </div>
+            <div class="panel-body">
+                {% set totalOrders = statusCounts|reduce((carry, v) => carry + v, 0) %}
+                {% if totalOrders > 0 %}
+                    <div class="donut-legend">
+                        {% set palette = {'en_attente': '#b08d4f', 'payee': '#4a6b8c', 'expediee': '#6b7355', 'livree': '#3f7d55', 'annulee': '#b23a3a'} %}
+                        {% for status, label in {'en_attente': 'En attente', 'payee': 'Payée', 'expediee': 'Expédiée', 'livree': 'Livrée', 'annulee': 'Annulée'} %}
+                            <div>
+                                <span class="dot" style="background: {{ palette[status] }}"></span>
+                                <span>{{ label }}</span>
+                                <span class="val">{{ statusCounts[status] }} <small class="text-muted">({{ ((statusCounts[status] / totalOrders) * 100)|round }}%)</small></span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Aucune commande.</p>
+                {% endif %}
+
+                <h3 style="font-family:var(--font-body); font-size:.76rem; letter-spacing:.14em; text-transform:uppercase; margin:26px 0 12px;">Meilleures ventes</h3>
+                <div class="donut-legend">
+                    {% for row in topProducts %}
+                        <div>
+                            <span>{{ row.name }}</span>
+                            <span class="val">{{ row.quantity }} × <small class="text-muted">{{ row.total|money }}</small></span>
+                        </div>
+                    {% else %}
+                        <p class="text-muted" style="margin:0;">Pas encore de données.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="panel">
+            <div class="panel-head">
+                <h2>Alertes de stock</h2>
+                <a class="link-arrow" href="{{ path('admin_product_index', {statut: 'rupture'}) }}">Gérer →</a>
+            </div>
+            <div class="panel-body panel-body--flush">
+                <table class="data-table">
+                    <thead><tr><th>Produit</th><th class="num">Stock</th></tr></thead>
+                    <tbody>
+                        {% for product in lowStock %}
+                            <tr>
+                                <td>
+                                    <div class="cell-product">
+                                        <div class="table-media">{% if product.mainImage %}<img src="{{ product.mainImage }}" alt="" loading="lazy">{% endif %}</div>
+                                        <div>
+                                            <strong>{{ product.name }}</strong>
+                                            <small>{{ product.sku }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="num">
+                                    <span class="tag {{ product.stock == 0 ? 'tag--danger' : 'tag--warn' }}">
+                                        {{ product.stock == 0 ? 'Rupture' : product.stock ~ ' restants' }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="2" class="text-muted">Tous les stocks sont sains 👌</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2>Derniers messages</h2>
+                <a class="link-arrow" href="{{ path('admin_message_index') }}">Boîte →</a>
+            </div>
+            <div class="panel-body panel-body--flush">
+                <table class="data-table">
+                    <thead><tr><th>Expéditeur</th><th>Sujet</th><th>Date</th></tr></thead>
+                    <tbody>
+                        {% for message in recentMessages %}
+                            <tr>
+                                <td>
+                                    {{ message.fullName }}
+                                    {% if not message.isRead %}<span class="tag tag--warn" style="margin-left:6px;">Nouveau</span>{% endif %}
+                                    <br><small class="text-muted">{{ message.email }}</small>
+                                </td>
+                                <td>{{ message.subject }}</td>
+                                <td class="text-muted">{{ message.createdAt|date('d/m/Y') }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="text-muted">Aucun message.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

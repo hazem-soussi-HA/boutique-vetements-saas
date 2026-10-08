@@ -1,0 +1,133 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Produits{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Catalogue</span>
+            <h1>Produits</h1>
+        </div>
+        <div class="toolbar">
+            <a class="btn btn--sm" href="{{ path('admin_product_new') }}">+ Nouveau produit</a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <form method="get" class="toolbar">
+                <input type="search" name="q" value="{{ search }}" placeholder="Nom ou référence..." style="min-width:220px;" aria-label="Rechercher un produit">
+                <select name="categorie" aria-label="Filtrer par catégorie">
+                    <option value="">Toutes les catégories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.slug }}" {{ category == cat.slug ? 'selected' : '' }}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="statut" aria-label="Filtrer par statut">
+                    <option value="">Tous les statuts</option>
+                    <option value="actif" {{ status == 'actif' ? 'selected' : '' }}>En ligne</option>
+                    <option value="inactif" {{ status == 'inactif' ? 'selected' : '' }}>Masqués</option>
+                    <option value="rupture" {{ status == 'rupture' ? 'selected' : '' }}>En rupture</option>
+                </select>
+                <button class="btn btn--sm" type="submit">Filtrer</button>
+                <a class="btn btn--sm btn--ghost" href="{{ path('admin_product_index') }}">Réinitialiser</a>
+            </form>
+            <span class="text-muted" style="font-size:.82rem;">{{ total }} produit{{ total > 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="panel-body panel-body--flush">
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Catégorie</th>
+                            <th class="num">Prix</th>
+                            <th class="num">Stock</th>
+                            <th>Statut</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>
+                                    <div class="cell-product">
+                                        <div class="table-media">
+                                            {% if product.mainImage %}<img src="{{ product.mainImage }}" alt="" loading="lazy">{% endif %}
+                                        </div>
+                                        <div>
+                                            <strong>{{ product.name }}</strong>
+                                            <small>{{ product.sku }}{% if product.brand %} · {{ product.brand.name }}{% endif %}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ product.category ? product.category.name : '—' }}</td>
+                                <td class="num">
+                                    {{ product.effectivePrice|money }}
+                                    {% if product.discountPercent > 0 %}<br><small class="text-muted" style="text-decoration:line-through;">{{ product.price|money }}</small>{% endif %}
+                                </td>
+                                <td class="num">
+                                    <span class="tag {{ product.stock == 0 ? 'tag--danger' : product.stock <= 5 ? 'tag--warn' : 'tag--ok' }}">{{ product.stock }}</span>
+                                </td>
+                                <td>
+                                    {% if product.isActive %}<span class="tag tag--ok">En ligne</span>{% else %}<span class="tag tag--muted">Masqué</span>{% endif %}
+                                    {% if product.isFeatured %}<span class="tag tag--info" style="margin-left:4px;">★</span>{% endif %}
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                        <a class="icon-action" href="{{ path('app_product', {slug: product.slug}) }}" target="_blank" rel="noopener" title="Voir sur le site">
+                                            <svg viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+                                        </a>
+
+                                        <form method="post" action="{{ path('admin_product_toggle', {id: product.id}) }}" class="inline-form">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ product.id) }}">
+                                            <button class="icon-action" type="submit" title="{{ product.isActive ? 'Masquer du site' : 'Publier sur le site' }}">
+                                                {% if product.isActive %}
+                                                    <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.1A9 9 0 0 1 12 5c5 0 9 4.5 9 7 0 .9-.5 2-1.4 3"/><path d="M6.2 6.7C4.4 8 3 10 3 12c0 2.5 4 7 9 7 1.6 0 3.1-.5 4.3-1.3"/></svg>
+                                                {% else %}
+                                                    <svg viewBox="0 0 24 24"><path d="M3 12c0-2.5 4-7 9-7s9 4.5 9 7-4 7-9 7-9-4.5-9-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                                                {% endif %}
+                                            </button>
+                                        </form>
+
+                                        <a class="icon-action" href="{{ path('admin_product_edit', {id: product.id}) }}" title="Modifier">
+                                            <svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>
+                                        </a>
+
+                                        <form method="post" action="{{ path('admin_product_delete', {id: product.id}) }}" class="inline-form"
+                                              data-confirm="Supprimer définitivement « {{ product.name }} » ?">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                                            <button class="icon-action icon-action--danger" type="submit" title="Supprimer">
+                                                <svg viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="6" class="text-muted" style="text-align:center; padding:48px;">
+                                Aucun produit trouvé. <a href="{{ path('admin_product_new') }}">Créer le premier produit →</a>
+                            </td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if pages > 1 %}
+            <div class="panel-body" style="border-top:1px solid var(--line);">
+                <nav class="pagination" aria-label="Pagination">
+                    {% set query = app.request.query.all %}
+                    {% if page > 1 %}<a href="{{ path('admin_product_index', query|merge({page: page - 1})) }}">←</a>{% endif %}
+                    {% set start = (page - 3)|max(1) %}
+                    {% set end = (start + 5)|min(pages) %}
+                    {% for i in start..end %}
+                        {% if i == page %}<span class="is-current">{{ i }}</span>{% else %}<a href="{{ path('admin_product_index', query|merge({page: i})) }}">{{ i }}</a>{% endif %}
+                    {% endfor %}
+                    {% if page < pages %}<a href="{{ path('admin_product_index', query|merge({page: page + 1})) }}">→</a>{% endif %}
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

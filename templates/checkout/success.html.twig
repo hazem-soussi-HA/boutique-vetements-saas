@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Commande confirmée — {{ settings.shopName }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container" style="max-width:680px; text-align:center;">
+            <div style="width:82px; height:82px; margin:0 auto 28px; border-radius:50%; background:#e7f2eb; display:grid; place-items:center;">
+                <svg viewBox="0 0 24 24" style="width:40px;height:40px;stroke:var(--success);fill:none;stroke-width:2;"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+
+            <span class="eyebrow">Merci pour votre confiance</span>
+            <h1>Commande confirmée</h1>
+            <p class="lead" style="margin-inline:auto; max-width:52ch;">
+                Votre commande <strong>{{ reference }}</strong> a bien été enregistrée.
+                Notre équipe vous appelle sous 24h pour confirmer la livraison.
+            </p>
+
+            <div class="panel" style="text-align:left; margin-top:36px;">
+                <div class="panel-head"><h2>Et maintenant ?</h2></div>
+                <div class="panel-body">
+                    <div class="steps">
+                        <div class="step">
+                            <h4>Confirmation</h4>
+                            <p>Vous recevez un e-mail avec le récapitulatif de la commande.</p>
+                        </div>
+                        <div class="step">
+                            <h4>Préparation</h4>
+                            <p>Contrôle qualité et pliage soigné sous 48h ouvrées.</p>
+                        </div>
+                        <div class="step">
+                            <h4>Expédition</h4>
+                            <p>Suivi envoyé par SMS et e-mail dès la remise au transporteur.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:34px;">
+                <a class="btn" href="{{ path('app_shop') }}">Continuer mes achats</a>
+                <a class="btn btn--ghost" href="{{ path('app_contact') }}">Une question ?</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

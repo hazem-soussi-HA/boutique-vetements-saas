@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales — {{ settings.shopName }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block body %}
+    <div class="container" style="max-width:800px; padding-block:60px 90px;">
+        <span class="eyebrow">Informations légales</span>
+        <h1 style="font-size:clamp(2rem,4vw,3rem);">Mentions légales</h1>
+
+        <div class="panel">
+            <div class="panel-body" style="display:grid; gap:24px;">
+                <div>
+                    <h3 style="font-family:var(--font-body); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;">Éditeur du site</h3>
+                    <p class="text-muted" style="margin:0;">
+                        {{ settings.shopName }} — {{ settings.contactAddress }}<br>
+                        E-mail : {{ settings.contactEmail }} · Téléphone : {{ settings.contactPhone }}
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-family:var(--font-body); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;">Hébergement</h3>
+                    <p class="text-muted" style="margin:0;">Données hébergées en Algérie. Solution technique développée en Symfony.</p>
+                </div>
+                <div>
+                    <h3 style="font-family:var(--font-body); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;">Propriété intellectuelle</h3>
+                    <p class="text-muted" style="margin:0;">L’ensemble des contenus (textes, visuels, photographies) est la propriété exclusive de {{ settings.shopName }}. Toute reproduction est interdite sans autorisation écrite.</p>
+                </div>
+                <div>
+                    <h3 style="font-family:var(--font-body); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;">Données personnelles</h3>
+                    <p class="text-muted" style="margin:0;">Les informations collectées lors d’une commande servent uniquement à son traitement et à la livraison. Elles ne sont ni revendues, ni utilisées à des fins publicitaires. Conformément à la loi 18-07, vous disposez d’un droit d’accès, de rectification et de suppression.</p>
+                </div>
+                <div>
+                    <h3 style="font-family:var(--font-body); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;">Prix et TVA</h3>
+                    <p class="text-muted" style="margin:0;">Les prix sont affichés en dinar algérien et incluent la TVA applicable ({{ settings.vatRate }} %). Les frais de livraison sont indiqués avant validation de la commande.</p>
+                </div>
+                <div>
+                    <h3 style="font-family:var(--font-body); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;">Crédits</h3>
+                    <p class="text-muted" style="margin:0;">Site conçu et développé par <strong>Hazem Soussi</strong> — architecture Symfony, design sur mesure.</p>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin-top:26px;"><a class="btn btn--ghost" href="{{ path('app_home') }}">Retour à l’accueil</a></p>
+    </div>
+{% endblock %}

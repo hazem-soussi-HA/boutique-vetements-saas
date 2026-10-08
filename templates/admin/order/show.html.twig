@@ -1,0 +1,126 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Commande {{ order.reference }}{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Commande</span>
+            <h1>{{ order.reference }}</h1>
+            <p class="text-muted" style="margin:6px 0 0;">Passée le {{ order.createdAt|date('d/m/Y à H:i') }}</p>
+        </div>
+        <div class="toolbar">
+            <a class="btn btn--sm btn--ghost" href="{{ path('admin_order_index') }}">← Retour</a>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="panel">
+            <div class="panel-head"><h2>Articles commandés</h2></div>
+            <div class="panel-body panel-body--flush">
+                <table class="data-table">
+                    <thead><tr><th>Produit</th><th>Options</th><th class="num">Prix</th><th class="num">Qté</th><th class="num">Total</th></tr></thead>
+                    <tbody>
+                        {% for item in order.items %}
+                            <tr>
+                                <td>
+                                    <div class="cell-product">
+                                        <div class="table-media">{% if item.productImage %}<img src="{{ item.productImage }}" alt="" loading="lazy">{% endif %}</div>
+                                        <div>
+                                            {% if item.product %}
+                                                <strong><a href="{{ path('app_product', {slug: item.product.slug}) }}" target="_blank" rel="noopener">{{ item.productName }}</a></strong>
+                                            {% else %}
+                                                <strong>{{ item.productName }}</strong>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-muted">
+                                    {% if item.size %}{{ item.size }}{% endif %}
+                                    {% if item.color %}{% if item.size %} · {% endif %}{{ item.color }}{% endif %}
+                                </td>
+                                <td class="num">{{ item.unitPrice|money }}</td>
+                                <td class="num">{{ item.quantity }}</td>
+                                <td class="num"><strong>{{ item.getTotal|money }}</strong></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="num">Sous-total</td>
+                            <td class="num">{{ order.subtotal|money }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="num">Livraison</td>
+                            <td class="num">{{ order.shipping == 0 ? 'Offerte' : order.shipping|money }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="num" style="font-weight:700; font-size:1.05rem;">Total</td>
+                            <td class="num" style="font-weight:700; font-size:1.05rem;">{{ order.total|money }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <div class="panel">
+                <div class="panel-head"><h2>Statut de la commande</h2></div>
+                <div class="panel-body">
+                    <p style="margin:0 0 14px;">
+                        Statut actuel :
+                        <span class="tag {{ order.status == 'livree' ? 'tag--ok' : order.status == 'annulee' ? 'tag--danger' : order.status == 'en_attente' ? 'tag--warn' : 'tag--info' }}">{{ order.statusLabel }}</span>
+                    </p>
+
+                    <form method="post" action="{{ path('admin_order_status', {id: order.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('status' ~ order.id) }}">
+                        <div class="field">
+                            <label for="status">Changer le statut</label>
+                            <select id="status" name="status">
+                                {% for key, label in statuses %}
+                                    <option value="{{ key }}" {{ order.status == key ? 'selected' : '' }}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn--sm" type="submit">Mettre à jour</button>
+                    </form>
+
+                    <form method="post" action="{{ path('admin_order_delete', {id: order.id}) }}" class="inline-form" style="margin-top:14px;"
+                          data-confirm="Supprimer définitivement la commande {{ order.reference }} ?">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
+                        <button class="btn btn--sm btn--danger" type="submit">Supprimer la commande</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-head"><h2>Client &amp; livraison</h2></div>
+                <div class="panel-body">
+                    <div style="display:grid; gap:16px;">
+                        <div>
+                            <span class="field-label">Client</span>
+                            <p style="margin:0;">{{ order.customerFullName }}<br>
+                                <a href="mailto:{{ order.customerEmail }}">{{ order.customerEmail }}</a><br>
+                                {% if order.customerPhone %}{{ order.customerPhone }}{% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <span class="field-label">Adresse de livraison</span>
+                            <p style="margin:0;">{{ order.shippingAddress }}<br>{{ order.shippingCity }}{% if order.shippingWilaya %}, {{ order.shippingWilaya }}{% endif %}</p>
+                        </div>
+                        <div>
+                            <span class="field-label">Paiement</span>
+                            <p style="margin:0;">{{ order.paymentLabel }}</p>
+                        </div>
+                        {% if order.notes %}
+                            <div>
+                                <span class="field-label">Note du client</span>
+                                <p style="margin:0;">{{ order.notes }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

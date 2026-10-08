@@ -1,0 +1,36 @@
+{% if settings and settings.announcement %}
+    <div class="announce">{{ settings.announcement }}</div>
+{% endif %}
+
+<header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+        <a class="brand-mark" href="{{ path('app_home') }}">
+            <strong>{{ settings ? settings.shopName : 'Maison Soussi' }}</strong>
+            <span>{{ settings and settings.tagline ? settings.tagline : 'Mode & Tradition' }}</span>
+        </a>
+
+        <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
+            {% set route = app.request.attributes.get('_route') %}
+            <a href="{{ path('app_home') }}" class="{{ route == 'app_home' ? 'is-active' : '' }}">Accueil</a>
+            <a href="{{ path('app_shop') }}" class="{{ route in ['app_shop', 'app_shop_category', 'app_product', 'app_brand'] ? 'is-active' : '' }}">Boutique</a>
+            <a href="{{ path('app_about') }}" class="{{ route == 'app_about' ? 'is-active' : '' }}">La maison</a>
+            <a href="{{ path('app_contact') }}" class="{{ route == 'app_contact' ? 'is-active' : '' }}">Contact</a>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_dashboard') }}">Back-office</a>
+            {% endif %}
+        </nav>
+
+        <div class="header-actions">
+            <a class="icon-btn" href="{{ path('app_shop') }}" aria-label="Voir la boutique">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            </a>
+            <a class="icon-btn" href="{{ path('app_cart') }}" aria-label="Panier, {{ cart_count|default(0) }} article(s)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+                <span class="cart-count">{{ cart_count|default(0) }}</span>
+            </a>
+            <button class="icon-btn burger" id="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+        </div>
+    </div>
+</header>

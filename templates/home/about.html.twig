@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+{% import 'partials/product.html.twig' as p %}
+
+{% block title %}La maison — {{ settings.shopName }}{% endblock %}
+{% block meta_description %}Notre histoire, notre atelier et nos engagements : qualité, durabilité et proximité.{% endblock %}
+
+{% block body %}
+    <section class="hero" style="min-height: 60vh;">
+        <div class="hero-bg">
+            <svg viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <defs>
+                    <linearGradient id="a1" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#2c241e"/><stop offset="60%" stop-color="#6b5a49"/><stop offset="100%" stop-color="#cbb69c"/>
+                    </linearGradient>
+                </defs>
+                <rect width="1600" height="800" fill="url(#a1)"/>
+                <circle cx="380" cy="220" r="150" fill="#e7dbcd" opacity=".35"/>
+                <path d="M780 800V330c0-44 36-80 80-80h60c44 0 80 36 80 80v470z" fill="#faf6f1" opacity=".18"/>
+            </svg>
+        </div>
+        <div class="container">
+            <div class="hero-inner">
+                <span class="eyebrow">Notre histoire</span>
+                <h1>Une maison née dans la Casbah</h1>
+                <p>Tout a commencé en 2016 avec deux machines à coudre, une table chez l-cigarette et une conviction :
+                    l’élégance algérienne mérite mieux que la copie.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="split">
+                <div class="reveal">
+                    <span class="eyebrow">Le point de départ</span>
+                    <h2>Deux machines, une conviction</h2>
+                    <p class="lead">
+                        En 2016, Ourida cousait des pièces sur commande pour ses voisines du quartier.
+                        Les pièces-parties sortaient de l’atelier, testées sur de vraies clientes, ajustées
+                        jusqu’à ce que la coupe tombe parfaitement.
+                    </p>
+                    <p class="text-muted">
+                        Aujourd’hui, Maison Soussi emploie neuf personnes à Alger centre. Nous travaillons
+                        toujours en petites séries, avec des ateliers de couture que nous visitons chaque mois,
+                        et une exigence simple : si nous ne la portons pas, nous ne la vendons pas.
+                    </p>
+                </div>
+                <div class="split-media reveal">
+                    <svg viewBox="0 0 600 750" aria-hidden="true">
+                        <defs><linearGradient id="b1" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#16110d"/><stop offset="100%" stop-color="#b08d4f"/></linearGradient></defs>
+                        <rect width="600" height="750" fill="url(#b1)"/>
+                        <path d="M220 200l80 52 80-52 160 82-56 110-44-24v382H204V368l-44 24-56-110z" fill="#faf6f1" opacity=".85"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: var(--white); border-block:1px solid var(--line);">
+        <div class="container">
+            <div class="section-head reveal" style="justify-content:center; text-align:center;">
+                <div>
+                    <span class="eyebrow">Engagements</span>
+                    <h2>Ce que nous ne négocierons jamais</h2>
+                </div>
+            </div>
+            <div class="grid-3">
+                <div class="quote reveal">
+                    <h4 style="font-family:var(--font-body); font-size:1rem; letter-spacing:.06em;">Matières tracées</h4>
+                    <p class="text-muted">Laine, lin et soie achetés auprès de filateurs identifiés. Nous refusons le polyester déguisé en « look ain ». Chaque fiche produit indique la composition exacte.</p>
+                </div>
+                <div class="quote reveal">
+                    <h4 style="font-family:var(--font-body); font-size:1rem; letter-spacing:.06em;">Petites séries</h4>
+                    <p class="text-muted">Nous produisons 50 à 200 pièces par modèle. C’est ce qui nous permet d’ajuster les coupes saison après saison au lieu de écouler un stock mort.</p>
+                </div>
+                <div class="quote reveal">
+                    <h4 style="font-family:var(--font-body); font-size:1rem; letter-spacing:.06em;">Prix honnêtes</h4>
+                    <p class="text-muted">Le prix affiché correspond au coût réel de confection, pas à un prix barré fabriqué. Aucun produit n’est en rupture artificielle pour créer l’urgence.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head reveal">
+                <div>
+                    <span class="eyebrow">Le parcours</span>
+                    <h2>De l’atelier à votre porte</h2>
+                </div>
+            </div>
+            <div class="steps">
+                <div class="step"><h4>Choix du tissu</h4><p>Sélection chez nos partenaires filateurs, test de tenue et de tombé.</p></div>
+                <div class="step"><h4>Patronage</h4><p>Essaiage sur mannequin, ajustement des pinces, validation sur trois tailles.</p></div>
+                <div class="step"><h4>Confection</h4><p>Coupe, assemblage et finitions cousues main sur les pièces qui le méritent.</p></div>
+                <div class="step"><h4>Contrôle</h4><p>Chaque pièce est vérifiée et repassée avant repli dans son emballage kraft.</p></div>
+            </div>
+        </div>
+    </section>
+
+    {% if categories is not empty %}
+        <section class="section" style="background: var(--cream-2); border-block:1px solid var(--line);">
+            <div class="container">
+                <div class="section-head reveal">
+                    <div>
+                        <span class="eyebrow">Explorer</span>
+                        <h2>Nos collections</h2>
+                    </div>
+                    <a class="link-arrow" href="{{ path('app_shop') }}">Boutique complète →</a>
+                </div>
+                <div class="cat-grid">
+                    {% for category in categories|slice(0, 3) %}
+                        <a class="cat-card reveal" href="{{ path('app_shop_category', {slug: category.slug}) }}">
+                            <svg viewBox="0 0 300 400" aria-hidden="true">
+                                <rect width="300" height="400" fill="hsl({{ 24 + loop.index0 * 18 }}, {{ 30 + loop.index0 * 6 }}%, {{ 80 - loop.index0 * 4 }}%)"/>
+                                <text x="150" y="215" text-anchor="middle" font-size="72">{{ category.icon ?? '✦' }}</text>
+                            </svg>
+                            <div class="cat-card-body"><h3>{{ category.name }}</h3><span>{{ category.products|length }} pièces</span></div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="newsletter-band section">
+        <div class="container newsletter-inner reveal">
+            <div>
+                <span class="eyebrow">Newsletter</span>
+                <h2 style="margin-bottom:12px;">-10% sur votre première commande</h2>
+                <p class="text-muted" style="max-width:44ch; margin:0;">Nouveautés, ventes privées et conseils de style, une fois par mois.</p>
+            </div>
+            <form method="post" action="{{ path('app_newsletter') }}" style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
+                <input class="form-input" style="flex:1; min-width:220px;" type="email" name="email" placeholder="votre@email.com" required aria-label="Votre adresse e-mail">
+                <button class="btn btn--gold" type="submit">Je m’inscris</button>
+            </form>
+        </div>
+    </section>
+{% endblock %}

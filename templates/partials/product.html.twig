@@ -1,0 +1,71 @@
+{% macro media(product, ratio) %}
+    {% if product.mainImage %}
+        <img src="{{ product.mainImage }}" alt="{{ product.name }}" loading="lazy">
+    {% else %}
+        <svg viewBox="0 0 300 400" role="img" aria-label="{{ product.name }}">
+            <rect width="300" height="400" fill="#f3ece4"/>
+            <path d="M120 90l30 20 30-20 60 30-20 40-16-8v180H96V152l-16 8-20-40z" fill="#d9cabb"/>
+        </svg>
+    {% endif %}
+{% endmacro %}
+
+{% macro card(product) %}
+    {% set gallery = product.gallery %}
+    <article class="product-card">
+        <a class="product-media" href="{{ path('app_product', {slug: product.slug}) }}" aria-label="{{ product.name }}">
+            {% if gallery is not empty %}
+                <img src="{{ gallery|first }}" alt="{{ product.name }}" loading="lazy">
+                {% if gallery|length > 1 %}<img class="alt" src="{{ gallery[1] }}" alt="" loading="lazy">{% endif %}
+            {% else %}
+                <svg viewBox="0 0 300 400" role="img" aria-label="{{ product.name }}">
+                    <rect width="300" height="400" fill="#f3ece4"/>
+                    <path d="M120 90l30 20 30-20 60 30-20 40-16-8v180H96V152l-16 8-20-40z" fill="#d9cabb"/>
+                </svg>
+            {% endif %}
+
+            <div class="product-flags">
+                {% if product.salePrice and product.discountPercent > 0 %}
+                    <span class="flag flag--sale">-{{ product.discountPercent }}%</span>
+                {% endif %}
+                {% if product.isNew %}<span class="flag flag--new">Nouveau</span>{% endif %}
+                {% if not product.inStock %}<span class="flag flag--out">Rupture</span>{% endif %}
+                {% if product.isLowStock %}<span class="flag">Plus que {{ product.stock }}</span>{% endif %}
+            </div>
+
+            {% if product.inStock %}
+                <div class="product-quick">
+                    <form method="post" action="{{ path('app_cart_add', {id: product.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cart_add') }}">
+                        <button class="btn btn--light btn--sm w-full" type="submit">Ajouter au panier</button>
+                    </form>
+                </div>
+            {% endif %}
+        </a>
+
+        <div class="product-body">
+            {% if product.category %}<span class="product-cat">{{ product.category.name }}</span>{% endif %}
+            <h3 class="product-title"><a href="{{ path('app_product', {slug: product.slug}) }}">{{ product.name }}</a></h3>
+            <div class="product-price">
+                <span class="price-now">{{ product.effectivePrice|money }}</span>
+                {% if product.salePrice and product.discountPercent > 0 %}
+                    <span class="price-was">{{ product.price|money }}</span>
+                {% endif %}
+            </div>
+            {% if product.colors|length > 0 %}
+                <div class="swatches" aria-label="Couleurs disponibles">
+                    {% for color in product.colors|slice(0, 4) %}
+                        <span class="swatch-dot" style="background: {{ color|lower|replace({'noir': '#16110d', 'blanc': '#f6f3ee', 'sable': '#e0cfa8', 'beige': '#e6dbc8', 'camel': '#c19a6b', 'rouge': '#a33b3b', 'bordeaux': '#5c1f28', 'kaki': '#6b7355', 'noir profond': '#0b0908'}) }};" title="{{ color }}"></span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </article>
+{% endmacro %}
+
+{% macro grid(products) %}
+    <div class="product-grid">
+        {% for product in products %}
+            {{ _self.card(product) }}
+        {% endfor %}
+    </div>
+{% endmacro %}

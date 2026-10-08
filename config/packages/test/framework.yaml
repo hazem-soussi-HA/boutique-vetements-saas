@@ -1,0 +1,11 @@
+framework:
+    test: true
+    session:
+        storage_factory_id: session.storage.factory.mock_file
+
+when@test:
+    framework:
+        rate_limiter:
+            contact_form: null
+            newsletter: null
+            cart: null

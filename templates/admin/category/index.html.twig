@@ -1,0 +1,65 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Catégories{% endblock %}
+
+{% block admin_body %}
+    <div class="admin-head">
+        <div>
+            <span class="crumb-label">Catalogue</span>
+            <h1>Catégories</h1>
+        </div>
+        <a class="btn btn--sm" href="{{ path('admin_category_new') }}">+ Nouvelle catégorie</a>
+    </div>
+
+    <div class="panel">
+        <div class="panel-body panel-body--flush">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Catégorie</th><th>Slug</th><th class="num">Produits</th><th>Ordre</th><th>Statut</th><th style="text-align:right;">Actions</th></tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td>
+                                <div class="cell-product">
+                                    {% if category.icon %}<span style="font-size:1.4rem;">{{ category.icon }}</span>{% endif %}
+                                    <div>
+                                        <strong>{{ category.name }}</strong>
+                                        {% if category.description %}<small>{{ category.description|text_limit(60) }}</small>{% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted">{{ category.slug }}</td>
+                            <td class="num">{{ category.products|length }}</td>
+                            <td class="num">{{ category.position }}</td>
+                            <td>
+                                {% if category.isActive %}<span class="tag tag--ok">Active</span>{% else %}<span class="tag tag--muted">Masquée</span>{% endif %}
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:6px; justify-content:flex-end;">
+                                    <a class="icon-action" href="{{ path('app_shop_category', {slug: category.slug}) }}" target="_blank" rel="noopener" title="Voir sur le site">
+                                        <svg viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+                                    </a>
+                                    <a class="icon-action" href="{{ path('admin_category_edit', {id: category.id}) }}" title="Modifier">
+                                        <svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg>
+                                    </a>
+                                    <form method="post" action="{{ path('admin_category_delete', {id: category.id}) }}" class="inline-form"
+                                          data-confirm="Supprimer la catégorie « {{ category.name }} » ?">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                                        <button class="icon-action icon-action--danger" type="submit" title="Supprimer">
+                                            <svg viewBox="0 0 24 24"><path d="M5 7h14"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="6" class="text-muted" style="text-align:center; padding:48px;">
+                            Aucune catégorie. <a href="{{ path('admin_category_new') }}">Créer la première →</a>
+                        </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
