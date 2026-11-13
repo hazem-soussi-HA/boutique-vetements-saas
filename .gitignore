@@ -34,3 +34,8 @@ session_*.txt
 /.vscode/
 .DS_Store
 Thumbs.db
+# Secrets — never commit (security remediation)
+/.env
+/.env.*
+!.env.dev.example
+!.env.example
